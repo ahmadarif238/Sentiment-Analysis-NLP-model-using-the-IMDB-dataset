@@ -6,8 +6,8 @@ import pickle
 import requests
 from io import BytesIO
 
-# Function to download the model file from Google Drive
-def download_model(file_id):
+# Function to download the file from Google Drive
+def download_file_from_google_drive(file_id):
     base_url = "https://drive.google.com/uc?export=download"
     session = requests.Session()
     
@@ -15,32 +15,31 @@ def download_model(file_id):
     if response.status_code == 200:
         return BytesIO(response.content)
     else:
-        st.error("Failed to download the trained_model.pkl file.")
+        st.error("Failed to download the file from Google Drive.")
+        st.stop()
+
+# Function to load a pickle file from Google Drive
+def load_pickle_from_google_drive(file_id):
+    try:
+        file_data = download_file_from_google_drive(file_id)
+        with BytesIO(file_data.read()) as f:
+            return pickle.load(f)
+    except pickle.UnpicklingError as e:
+        st.error(f"Error loading pickle file: {e}")
         st.stop()
 
 # File ID for the trained_model.pkl file
-file_id = "1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
+model_file_id = "1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
 
 # Download and load the model
-try:
-    model_data = download_model(file_id)
-    with BytesIO(model_data.read()) as f:
-        ensemble_model = pickle.load(f)
-except pickle.UnpicklingError as e:
-    st.error(f"Error loading model: {e}")
-    st.stop()
+ensemble_model = load_pickle_from_google_drive(model_file_id)
 
-# Load the vectorizer file
-try:
-    vectorizer_data = download_model(file_id)
-    with BytesIO(vectorizer_data.read()) as f:
-        vectorizer = pickle.load(f)
-except FileNotFoundError:
-    st.error("vectorizer.pkl file not found.")
-    st.stop()
-except pickle.UnpicklingError as e:
-    st.error(f"Error loading vectorizer: {e}")
-    st.stop()
+# Load the vectorizer if it's also on Google Drive
+# If you don't have a vectorizer file, you can comment out these lines
+# vectorizer_file_id = "your_vectorizer_file_id"
+# vectorizer = load_pickle_from_google_drive(vectorizer_file_id)
+
+# If you need a local vectorizer file, provide its path accordingly
 
 nltk.download('punkt')
 
@@ -71,10 +70,15 @@ def get_review():
         if st.button("Submit Review"):
             if review:
                 review_preprocessed = preprocess_text(review)
-                review_tfidf = vectorizer.transform([review_preprocessed])
-                prediction = ensemble_model.predict(review_tfidf)
-                sentiment = "Positive" if prediction[0] == 'positive' else "Negative"
-                st.write(f"The sentiment of your review is: {sentiment}")
+                # Ensure vectorizer is properly loaded; use local path if necessary
+                try:
+                    review_tfidf = vectorizer.transform([review_preprocessed])
+                    prediction = ensemble_model.predict(review_tfidf)
+                    sentiment = "Positive" if prediction[0] == 'positive' else "Negative"
+                    st.write(f"The sentiment of your review is: {sentiment}")
+                except Exception as e:
+                    st.error(f"Error processing the review: {e}")
+                
                 if st.button("Submit Another Review"):
                     st.experimental_rerun()
             else:
