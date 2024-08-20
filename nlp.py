@@ -3,6 +3,31 @@ import nltk
 from nltk.tokenize import word_tokenize
 import re
 import pickle
+import os
+import requests
+
+# Function to download and combine split files
+def download_and_combine_files():
+    part1_url = "https://github.com/your-username/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part1.rar"
+    part2_url = "https://github.com/your-username/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part2.rar"
+    
+    # Download the files
+    with open("trained_model.part1.rar", "wb") as f:
+        f.write(requests.get(part1_url).content)
+    with open("trained_model.part2.rar", "wb") as f:
+        f.write(requests.get(part2_url).content)
+    
+    # Combine the files
+    with open("trained_model_combined.rar", "wb") as combined:
+        for part in ["trained_model.part1.rar", "trained_model.part2.rar"]:
+            with open(part, "rb") as f:
+                combined.write(f.read())
+    
+    # Extract the combined file
+    os.system("unrar x trained_model_combined.rar")
+
+# Call the function to download and combine files
+download_and_combine_files()
 
 # Load the trained model and vectorizer
 with open('trained_model.pkl', 'rb') as f:
