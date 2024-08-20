@@ -19,6 +19,11 @@ def download_and_combine_files():
     
     # Extract the combined file
     os.system("unrar x trained_model_combined.rar")
+    
+    # Check if the extraction was successful
+    if not os.path.exists('trained_model.pkl'):
+        st.error("Failed to extract the trained_model.pkl file. Please check the extraction process.")
+        st.stop()
 
 # Call the function to download and combine files
 download_and_combine_files()
