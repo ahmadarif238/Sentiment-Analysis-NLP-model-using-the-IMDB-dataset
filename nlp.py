@@ -75,7 +75,7 @@ else:
     st.error("Failed to download and combine model files.")
 
 # Download the 'punkt' tokenizer
-nltk.download('punkt')
+nltk.download('punkt_tab')
 
 def preprocess_text(text):
     text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
