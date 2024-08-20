@@ -4,21 +4,43 @@ from nltk.tokenize import word_tokenize
 import re
 import pickle
 import os
+import requests
+import rarfile
 
-# Function to download the model file from an external source
-def download_model():
-    model_url = "https://drive.google.com/uc?export=download&id=1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
-    
-    # Download the file
-    os.system(f"curl -L {model_url} -o trained_model.pkl")
-    
-    # Check if the download was successful
-    if not os.path.exists('trained_model.pkl'):
-        st.error("Failed to download the trained_model.pkl file. Please check the download process.")
-        st.stop()
+# Function to download and recombine model files
+def download_and_recombine_model():
+    # URLs for the .rar parts on GitHub (replace with your actual URLs)
+    url_part1 = 'trained_model.part1.rar'
+    url_part2 = 'trained_model.part2.rar'
 
-# Call the function to download the model file
-download_model()
+    # Download the first part
+    response = requests.get(url_part1)
+    with open('trained_model.part1.rar', 'wb') as file:
+        file.write(response.content)
+
+    # Download the second part
+    response = requests.get(url_part2)
+    with open('trained_model.part2.rar', 'wb') as file:
+        file.write(response.content)
+
+    # Recombine the .rar parts
+    combined_rar_path = 'combined_trained_model.rar'
+    with open(combined_rar_path, 'wb') as output_file:
+        for part in ['trained_model.part1.rar', 'trained_model.part2.rar']:
+            with open(part, 'rb') as input_file:
+                output_file.write(input_file.read())
+
+    # Extract the combined .rar file
+    with rarfile.RarFile(combined_rar_path) as rf:
+        rf.extractall()
+
+    # Clean up the individual parts and the combined .rar file
+    os.remove('trained_model.part1.rar')
+    os.remove('trained_model.part2.rar')
+    os.remove(combined_rar_path)
+
+# Call the function to download, recombine, and extract the model file
+download_and_recombine_model()
 
 # Load the trained model and vectorizer
 with open('trained_model.pkl', 'rb') as f:
