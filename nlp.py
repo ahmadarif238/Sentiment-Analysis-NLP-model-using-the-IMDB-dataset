@@ -12,31 +12,50 @@ def download_and_combine_files():
     part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part2.rar"
     
     # Download the files
-    with open("trained_model.part1.rar", "wb") as f:
-        f.write(requests.get(part1_url).content)
-    with open("trained_model.part2.rar", "wb") as f:
-        f.write(requests.get(part2_url).content)
+    try:
+        with open("trained_model.part1.rar", "wb") as f:
+            f.write(requests.get(part1_url).content)
+        with open("trained_model.part2.rar", "wb") as f:
+            f.write(requests.get(part2_url).content)
+    except Exception as e:
+        st.error(f"Error downloading files: {e}")
+        return False
     
     # Combine the files
-    with open("trained_model_combined.rar", "wb") as combined:
-        for part in ["trained_model.part1.rar", "trained_model.part2.rar"]:
-            with open(part, "rb") as f:
-                combined.write(f.read())
+    try:
+        with open("trained_model_combined.rar", "wb") as combined:
+            for part in ["trained_model.part1.rar", "trained_model.part2.rar"]:
+                with open(part, "rb") as f:
+                    combined.write(f.read())
+    except Exception as e:
+        st.error(f"Error combining files: {e}")
+        return False
     
     # Extract the combined file
-    os.system("unrar x trained_model_combined.rar")
+    try:
+        os.system("unrar x trained_model_combined.rar")
+    except Exception as e:
+        st.error(f"Error extracting files: {e}")
+        return False
+    
+    return True
 
 # Call the function to download and combine files
-download_and_combine_files()
+if download_and_combine_files():
+    # Load the trained model and vectorizer
+    try:
+        with open('trained_model.pkl', 'rb') as f:
+            ensemble_model = pickle.load(f)
+        with open('vectorizer.pkl', 'rb') as f:
+            vectorizer = pickle.load(f)
+    except FileNotFoundError:
+        st.error("Model files not found. Please check the file paths.")
+    except Exception as e:
+        st.error(f"Error loading model files: {e}")
+else:
+    st.error("Failed to download and combine model files.")
 
-# Load the trained model and vectorizer
-with open('trained_model.pkl', 'rb') as f:
-    ensemble_model = pickle.load(f)
-
-with open('vectorizer.pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
-
-nltk.download('punkt_tab')
+nltk.download('punkt')
 
 def preprocess_text(text):
     text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
