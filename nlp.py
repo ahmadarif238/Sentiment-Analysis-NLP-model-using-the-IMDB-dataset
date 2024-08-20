@@ -8,8 +8,8 @@ import requests
 
 # Function to download and combine split files
 def download_and_combine_files():
-    part1_url = "https://github.com/your-username/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part1.rar"
-    part2_url = "https://github.com/your-username/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part2.rar"
+    part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part1.rar"
+    part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part2.rar"
     
     # Download the files
     with open("trained_model.part1.rar", "wb") as f:
