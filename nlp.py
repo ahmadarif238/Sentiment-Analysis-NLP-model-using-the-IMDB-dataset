@@ -21,8 +21,8 @@ def download_file(url, local_filename):
 # Function to download and extract the model
 def download_and_extract_model():
     # Download the parts
-    part1_url = "trained_model.part1.rar"
-    part2_url = "trained_model.part2.rar"
+    part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part1.rar"
+    part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part2.rar"
     
     download_file(part1_url, 'trained_model.part1.rar')
     download_file(part2_url, 'trained_model.part2.rar')
