@@ -5,37 +5,40 @@ import re
 import pickle
 import os
 import requests
-from zipfile import ZipFile
+import rarfile
 
-# Function to download and extract model files
+# Function to download a file from a URL
+def download_file(url, local_filename):
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(local_filename, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+    else:
+        st.error(f"Failed to download {local_filename}. Status code: {response.status_code}")
+        st.stop()
+
+# Function to download and extract the model
 def download_and_extract_model():
-    # URLs for the ZIP parts on GitHub (replace with your actual URLs)
-    url_part1 = 'https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/7b8d2553032dd2294db4c9d52bb32642101d2b55/trained_model.part1.rar'
-    url_part2 = 'https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/e3c6bd31201f05dd923ca11c7d67d2ad882b6d33/trained_model.part2.rar'
+    # Download the parts
+    part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part1.rar"
+    part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part2.rar"
+    
+    download_file(part1_url, 'trained_model.part1.rar')
+    download_file(part2_url, 'trained_model.part2.rar')
+    
+    # Combine the parts
+    with open('trained_model.part1.rar', 'rb') as part1, open('trained_model.part2.rar', 'rb') as part2:
+        combined_rar_path = 'trained_model_combined.rar'
+        with open(combined_rar_path, 'wb') as combined:
+            combined.write(part1.read())
+            combined.write(part2.read())
+    
+    # Extract the model from the combined rar file
+    with rarfile.RarFile(combined_rar_path) as rf:
+        rf.extractall()
 
-    # Download the ZIP parts
-    for url, filename in [(url_part1, 'trained_model.part1.zip'), (url_part2, 'trained_model.part2.zip')]:
-        response = requests.get(url)
-        with open(filename, 'wb') as file:
-            file.write(response.content)
-
-    # Combine and extract the ZIP files
-    combined_zip_path = 'combined_trained_model.zip'
-    with open(combined_zip_path, 'wb') as output_file:
-        for part in ['trained_model.part1.zip', 'trained_model.part2.zip']:
-            with open(part, 'rb') as input_file:
-                output_file.write(input_file.read())
-
-    # Extract the combined ZIP file
-    with ZipFile(combined_zip_path, 'r') as zip_ref:
-        zip_ref.extractall()
-
-    # Clean up the individual parts and the combined ZIP file
-    os.remove('trained_model.part1.zip')
-    os.remove('trained_model.part2.zip')
-    os.remove(combined_zip_path)
-
-# Call the function to download, combine, and extract the model file
+# Call the function to download and extract the model
 download_and_extract_model()
 
 # Load the trained model and vectorizer
