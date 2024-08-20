@@ -36,7 +36,7 @@ with open('trained_model.pkl', 'rb') as f:
 with open('vectorizer.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
 
-nltk.download('punkt')
+nltk.download('punkt_tab')
 
 def preprocess_text(text):
     text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
