@@ -7,28 +7,32 @@ import requests
 from io import BytesIO
 
 # Function to download the model file from Google Drive
-def download_model():
-    model_url = "https://drive.google.com/uc?export=download&id=1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
-    response = requests.get(model_url, stream=True)
+def download_model(file_id):
+    base_url = "https://drive.google.com/uc?export=download"
+    session = requests.Session()
     
+    response = session.get(f"{base_url}&id={file_id}", stream=True)
     if response.status_code == 200:
         return BytesIO(response.content)
     else:
         st.error("Failed to download the trained_model.pkl file.")
         st.stop()
 
-# Load the trained model and vectorizer
+# File ID for the trained_model.pkl file
+file_id = "1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
+
+# Download and load the model
 try:
-    model_data = download_model()
+    model_data = download_model(file_id)
     with BytesIO(model_data.read()) as f:
         ensemble_model = pickle.load(f)
 except pickle.UnpicklingError as e:
     st.error(f"Error loading model: {e}")
     st.stop()
 
-# Assuming you have a vectorizer.pkl file, replace with actual path
+# Load the vectorizer file
 try:
-    vectorizer_data = download_model()
+    vectorizer_data = download_model(file_id)
     with BytesIO(vectorizer_data.read()) as f:
         vectorizer = pickle.load(f)
 except FileNotFoundError:
