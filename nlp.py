@@ -5,11 +5,22 @@ import re
 import pickle
 import os
 import requests
+import hashlib
+
+# Function to verify file integrity using checksums
+def verify_checksum(file_path, expected_checksum):
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest() == expected_checksum
 
 # Function to download and combine split files
 def download_and_combine_files():
     part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part1.rar"
     part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part2.rar"
+    part1_checksum = "expected_checksum_part1"  # Replace with actual checksum
+    part2_checksum = "expected_checksum_part2"  # Replace with actual checksum
     
     # Download the files
     try:
@@ -19,6 +30,14 @@ def download_and_combine_files():
             f.write(requests.get(part2_url).content)
     except Exception as e:
         st.error(f"Error downloading files: {e}")
+        return False
+    
+    # Verify file integrity
+    if not verify_checksum("trained_model.part1.rar", part1_checksum):
+        st.error("Checksum verification failed for part1.rar")
+        return False
+    if not verify_checksum("trained_model.part2.rar", part2_checksum):
+        st.error("Checksum verification failed for part2.rar")
         return False
     
     # Combine the files
