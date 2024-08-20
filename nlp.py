@@ -4,30 +4,39 @@ from nltk.tokenize import word_tokenize
 import re
 import pickle
 import requests
-import os
+from io import BytesIO
 
-
+# Function to download the model file from Google Drive
 def download_model():
     model_url = "https://drive.google.com/uc?export=download&id=1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
     response = requests.get(model_url, stream=True)
     
     if response.status_code == 200:
-        with open('trained_model.pkl', 'wb') as f:
-            f.write(response.content)
+        return BytesIO(response.content)
     else:
         st.error("Failed to download the trained_model.pkl file.")
         st.stop()
 
-
-# Call the function to download the model file
-download_model()
-
 # Load the trained model and vectorizer
-with open('trained_model.pkl', 'rb') as f:
-    ensemble_model = pickle.load(f)
+try:
+    model_data = download_model()
+    with BytesIO(model_data.read()) as f:
+        ensemble_model = pickle.load(f)
+except pickle.UnpicklingError as e:
+    st.error(f"Error loading model: {e}")
+    st.stop()
 
-with open('vectorizer.pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
+# Assuming you have a vectorizer.pkl file, replace with actual path
+try:
+    vectorizer_data = download_model()
+    with BytesIO(vectorizer_data.read()) as f:
+        vectorizer = pickle.load(f)
+except FileNotFoundError:
+    st.error("vectorizer.pkl file not found.")
+    st.stop()
+except pickle.UnpicklingError as e:
+    st.error(f"Error loading vectorizer: {e}")
+    st.stop()
 
 nltk.download('punkt')
 
@@ -39,7 +48,6 @@ def preprocess_text(text):
 
 st.title("Movie Review Sentiment Analysis")
 
-# Function to get user input and predict sentiment
 def get_review():
     movie_suggestions = [
         "Borderlands (2024)",
@@ -58,11 +66,8 @@ def get_review():
         review = st.text_area("Enter your review for the movie:")
         if st.button("Submit Review"):
             if review:
-                # Preprocess the review
                 review_preprocessed = preprocess_text(review)
-                # Transform the review using the TF-IDF vectorizer
                 review_tfidf = vectorizer.transform([review_preprocessed])
-                # Predict the sentiment
                 prediction = ensemble_model.predict(review_tfidf)
                 sentiment = "Positive" if prediction[0] == 'positive' else "Negative"
                 st.write(f"The sentiment of your review is: {sentiment}")
