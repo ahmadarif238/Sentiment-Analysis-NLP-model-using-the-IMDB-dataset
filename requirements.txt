@@ -3,5 +3,3 @@ nltk
 pandas
 scikit-learn
 joblib
-re
-pickle
