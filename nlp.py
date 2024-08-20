@@ -31,9 +31,9 @@ def download_and_combine_files():
         st.error(f"Error combining files: {e}")
         return False
     
-    # Extract the combined file
+    # Extract the combined file using p7zip
     try:
-        os.system("unrar x trained_model_combined.rar")
+        os.system("7z x trained_model_combined.rar")
     except Exception as e:
         st.error(f"Error extracting files: {e}")
         return False
