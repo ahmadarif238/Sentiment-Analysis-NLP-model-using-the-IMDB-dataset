@@ -6,19 +6,18 @@ import pickle
 import requests
 import os
 
-# Function to download the model file from Google Drive
+
 def download_model():
     model_url = "https://drive.google.com/uc?export=download&id=1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
     response = requests.get(model_url, stream=True)
     
-    # Check if the download was successful
     if response.status_code == 200:
         with open('trained_model.pkl', 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
+            f.write(response.content)
     else:
-        st.error("Failed to download the trained_model.pkl file. Please check the download process.")
+        st.error("Failed to download the trained_model.pkl file.")
         st.stop()
+
 
 # Call the function to download the model file
 download_model()
