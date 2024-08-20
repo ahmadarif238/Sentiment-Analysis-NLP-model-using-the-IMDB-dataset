@@ -7,7 +7,7 @@ import os
 
 # Function to download the model file from an external source
 def download_model():
-    model_url = "https://drive.google.com/file/d/1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS/view?usp=sharing"
+    model_url = "https://drive.google.com/file/d/1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS//uc?export=download"
     
     # Download the file
     os.system(f"curl -L {model_url} -o trained_model.pkl")
