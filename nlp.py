@@ -10,8 +10,8 @@ import rarfile
 # Function to download and recombine model files
 def download_and_recombine_model():
     # URLs for the .rar parts on GitHub (replace with your actual URLs)
-    url_part1 = 'trained_model.part1.rar'
-    url_part2 = 'trained_model.part2.rar'
+    url_part1 = 'https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/7b8d2553032dd2294db4c9d52bb32642101d2b55/trained_model.part1.rar'
+    url_part2 = 'https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/ed514d8dbeead47f990595002fee1b7e51d09e1a/trained_model.part2.rar'
 
     # Download the first part
     response = requests.get(url_part1)
