@@ -1,46 +1,27 @@
 import streamlit as st
-import rarfile
+import nltk
+from nltk.tokenize import word_tokenize
+import re
+import pickle
 import requests
 import os
 
-# Function to download a file from a URL
-def download_file(url, local_filename):
-    response = requests.get(url, stream=True)
+# Function to download the model file from Google Drive
+def download_model():
+    model_url = "https://drive.google.com/uc?export=download&id=1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS"
+    response = requests.get(model_url, stream=True)
+    
+    # Check if the download was successful
     if response.status_code == 200:
-        with open(local_filename, 'wb') as f:
+        with open('trained_model.pkl', 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
     else:
-        st.error(f"Failed to download {local_filename}. Status code: {response.status_code}")
+        st.error("Failed to download the trained_model.pkl file. Please check the download process.")
         st.stop()
 
-# Function to download and extract the model
-def download_and_extract_model():
-    # Download the parts
-    part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part1.rar"
-    part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part2.rar"
-    
-    download_file(part1_url, 'trained_model.part1.rar')
-    download_file(part2_url, 'trained_model.part2.rar')
-    
-    # Combine the parts
-    combined_rar_path = 'trained_model_combined.rar'
-    with open(combined_rar_path, 'wb') as combined:
-        with open('trained_model.part1.rar', 'rb') as part1:
-            combined.write(part1.read())
-        with open('trained_model.part2.rar', 'rb') as part2:
-            combined.write(part2.read())
-    
-    # Extract the model from the combined rar file
-    try:
-        with rarfile.RarFile(combined_rar_path) as rf:
-            rf.extractall()
-    except rarfile.BadRarFile:
-        st.error("The combined file is not a valid RAR file. Please check the file.")
-        st.stop()
-
-# Call the function to download and extract the model
-download_and_extract_model()
+# Call the function to download the model file
+download_model()
 
 # Load the trained model and vectorizer
 with open('trained_model.pkl', 'rb') as f:
