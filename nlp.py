@@ -5,42 +5,38 @@ import re
 import pickle
 import os
 import requests
-import rarfile
+from zipfile import ZipFile
 
-# Function to download and recombine model files
-def download_and_recombine_model():
-    # URLs for the .rar parts on GitHub (replace with your actual URLs)
+# Function to download and extract model files
+def download_and_extract_model():
+    # URLs for the ZIP parts on GitHub (replace with your actual URLs)
     url_part1 = 'https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/7b8d2553032dd2294db4c9d52bb32642101d2b55/trained_model.part1.rar'
-    url_part2 = 'https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/ed514d8dbeead47f990595002fee1b7e51d09e1a/trained_model.part2.rar'
+    url_part2 = 'https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/e3c6bd31201f05dd923ca11c7d67d2ad882b6d33/trained_model.part2.rar'
 
-    # Download the first part
-    response = requests.get(url_part1)
-    with open('trained_model.part1.rar', 'wb') as file:
-        file.write(response.content)
+    # Download the ZIP parts
+    for url, filename in [(url_part1, 'trained_model.part1.zip'), (url_part2, 'trained_model.part2.zip')]:
+        response = requests.get(url)
+        with open(filename, 'wb') as file:
+            file.write(response.content)
 
-    # Download the second part
-    response = requests.get(url_part2)
-    with open('trained_model.part2.rar', 'wb') as file:
-        file.write(response.content)
-
-    # Recombine the .rar parts
-    combined_rar_path = 'combined_trained_model.rar'
-    with open(combined_rar_path, 'wb') as output_file:
-        for part in ['trained_model.part1.rar', 'trained_model.part2.rar']:
+    # Combine and extract the ZIP files
+    combined_zip_path = 'combined_trained_model.zip'
+    with open(combined_zip_path, 'wb') as output_file:
+        for part in ['trained_model.part1.zip', 'trained_model.part2.zip']:
             with open(part, 'rb') as input_file:
                 output_file.write(input_file.read())
 
-    # Extract the combined .rar file
-    with rarfile.RarFile(combined_rar_path) as rf:
-        rf.extractall()
+    # Extract the combined ZIP file
+    with ZipFile(combined_zip_path, 'r') as zip_ref:
+        zip_ref.extractall()
 
-    # Clean up the individual parts and the combined .rar file
-    os.remove('trained_model.part1.rar')
-    os.remove('trained_model.part2.rar')
-    os.remove(combined_rar_path)
+    # Clean up the individual parts and the combined ZIP file
+    os.remove('trained_model.part1.zip')
+    os.remove('trained_model.part2.zip')
+    os.remove(combined_zip_path)
 
-# Call the function to download, recombine, and extract the model file
-download_and_recombine_model()
+# Call the function to download, combine, and extract the model file
+download_and_extract_model()
 
 # Load the trained model and vectorizer
 with open('trained_model.pkl', 'rb') as f:
