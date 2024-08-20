@@ -21,22 +21,27 @@ def download_file(url, local_filename):
 # Function to download and extract the model
 def download_and_extract_model():
     # Download the parts
-    part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part1.rar"
-    part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/blob/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part2.rar"
+    part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part1.rar"
+    part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/4f2f2b376857a1171fbf41f962bc394b8c16f9fd/trained_model.part2.rar"
     
     download_file(part1_url, 'trained_model.part1.rar')
     download_file(part2_url, 'trained_model.part2.rar')
     
     # Combine the parts
-    with open('trained_model.part1.rar', 'rb') as part1, open('trained_model.part2.rar', 'rb') as part2:
-        combined_rar_path = 'trained_model_combined.rar'
-        with open(combined_rar_path, 'wb') as combined:
+    combined_rar_path = 'trained_model_combined.rar'
+    with open(combined_rar_path, 'wb') as combined:
+        with open('trained_model.part1.rar', 'rb') as part1:
             combined.write(part1.read())
+        with open('trained_model.part2.rar', 'rb') as part2:
             combined.write(part2.read())
     
     # Extract the model from the combined rar file
-    with rarfile.RarFile(combined_rar_path) as rf:
-        rf.extractall()
+    try:
+        with rarfile.RarFile(combined_rar_path) as rf:
+            rf.extractall()
+    except rarfile.BadRarFile:
+        st.error("The combined file is not a valid RAR file. Please check the file.")
+        st.stop()
 
 # Call the function to download and extract the model
 download_and_extract_model()
