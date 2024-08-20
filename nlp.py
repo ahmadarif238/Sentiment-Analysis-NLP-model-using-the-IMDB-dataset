@@ -5,28 +5,20 @@ import re
 import pickle
 import os
 
-# Function to download and combine split files
-def download_and_combine_files():
-    part1_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part1.rar"
-    part2_url = "https://github.com/ahmadarif238/Sentiment-Analysis-NLP-model-using-the-IMDB-dataset/raw/main/trained_model.part2.rar"
+# Function to download the model file from an external source
+def download_model():
+    model_url = "https://drive.google.com/file/d/1hd-BRqA_t3E7HH1k0nkTYTfuPApw3LwS/view?usp=sharing"
     
-    # Download the files
-    os.system(f"curl -L {part1_url} -o trained_model.part1.rar")
-    os.system(f"curl -L {part2_url} -o trained_model.part2.rar")
+    # Download the file
+    os.system(f"curl -L {model_url} -o trained_model.pkl")
     
-    # Combine the files
-    os.system("cat trained_model.part1.rar trained_model.part2.rar > trained_model_combined.rar")
-    
-    # Extract the combined file
-    os.system("unrar x trained_model_combined.rar")
-    
-    # Check if the extraction was successful
+    # Check if the download was successful
     if not os.path.exists('trained_model.pkl'):
-        st.error("Failed to extract the trained_model.pkl file. Please check the extraction process.")
+        st.error("Failed to download the trained_model.pkl file. Please check the download process.")
         st.stop()
 
-# Call the function to download and combine files
-download_and_combine_files()
+# Call the function to download the model file
+download_model()
 
 # Load the trained model and vectorizer
 with open('trained_model.pkl', 'rb') as f:
