@@ -17,7 +17,7 @@ def load_vectorizer():
 ensemble_model = load_model()
 vectorizer = load_vectorizer()
 
-nltk.download('punkt')
+nltk.download('punkt_tab')
 
 def preprocess_text(text):
     text = re.sub(r'<.*?>', '', text)  # Remove HTML tags
