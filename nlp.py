@@ -3,14 +3,19 @@ import nltk
 from nltk.tokenize import word_tokenize
 import re
 import pickle
-import warnings  # Import the warnings module
 
-# Load the trained model and vectorizer
-with open('trained_model.pkl', 'rb') as f:
-    ensemble_model = pickle.load(f)
+@st.cache
+def load_model():
+    with open('trained_model.pkl', 'rb') as f:
+        return pickle.load(f)
 
-with open('vectorizer.pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
+@st.cache
+def load_vectorizer():
+    with open('vectorizer.pkl', 'rb') as f:
+        return pickle.load(f)
+
+ensemble_model = load_model()
+vectorizer = load_vectorizer()
 
 nltk.download('punkt')
 
@@ -22,7 +27,6 @@ def preprocess_text(text):
 
 st.title("Movie Review Sentiment Analysis")
 
-# Function to get user input and predict sentiment
 def get_review():
     movie_suggestions = [
         "Borderlands (2024)",
@@ -41,11 +45,8 @@ def get_review():
         review = st.text_area("Enter your review for the movie:")
         if st.button("Submit Review"):
             if review:
-                # Preprocess the review
                 review_preprocessed = preprocess_text(review)
-                # Transform the review using the TF-IDF vectorizer
                 review_tfidf = vectorizer.transform([review_preprocessed])
-                # Predict the sentiment
                 prediction = ensemble_model.predict(review_tfidf)
                 sentiment = "Positive" if prediction[0] == 'positive' else "Negative"
                 st.write(f"The sentiment of your review is: {sentiment}")
